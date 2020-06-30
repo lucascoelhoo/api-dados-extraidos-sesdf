@@ -29,7 +29,7 @@ import logging
 
 #from flask_cors import CORS
 app = flask.Flask(__name__)
-dbpath='C:/Users/lucas/Desktop/UNB/Mestrado/Projetos/App-Covid-19/Servidor-Flask/'
+dbpath='/home/simop/api-dados-extraidos-sesdf/'
 dbname='dados-extraidos-covid19-sesdf.db'
 global db
 db=dbpath+dbname
@@ -43,12 +43,12 @@ def dict_factory(cursor, row):
 
 
 
-@app.route("/")
+@app.route("/apiv2")
 def hello():
     return "<h1>Distant Reading Archive</h1><p>A prototype API for distant reading of science fiction novels.</p>"
     #return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
-@app.route('/regiao/all', methods=['GET'])
+@app.route('/apiv2/regiao/all', methods=['GET'])
 def api_all():
     print("!!!!!!!!")
     conn = sqlite3.connect(db)
@@ -65,7 +65,7 @@ def page_not_found(e):
     return "<h1>404</h1><p>The resource could not be found.</p>", 404
 
 
-@app.route('/regiao/', methods=['GET'])
+@app.route('/apiv2/regiao/', methods=['GET'])
 def api_filtro():
     query_parameters = request.args;
     #cpf = query_parameters.get('cpf')
@@ -115,7 +115,7 @@ def api_filtro():
 
 
 
-@app.route('/regiao/list', methods=['GET'])
+@app.route('/apiv2/regiao/list', methods=['GET'])
 def api_list():
     print("!!!!!!!!2")
     conn = sqlite3.connect(db)
@@ -142,9 +142,10 @@ def add_headers_to_fontawesome_static_files(response):
 
 
 
-#SSL PRECISA DO pyOpenSSL instalado, é so usar pip
+#SSL PRECISA DO pyOpenSSL instalado
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    app.run()
+    app.run(host='0.0.0.0', port=5003)
     app.after_request(add_headers_to_fontawesome_static_files)
     #app.run(ssl_context='adhoc')
+

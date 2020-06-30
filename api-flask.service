@@ -1,0 +1,11 @@
+
+[Unit]
+Description=Gunicorn
+[Service]
+User=simop
+Group=www-data
+WorkingDirectory=/home/simop/api-dados-extraidos-sesdf
+Environment=/usr/local/bin/gunicorn
+ExecStart=/home/simop/api-dados-extraidos-sesdf/script-init.sh
+[Install]
+WantedBy=multi-user.target
