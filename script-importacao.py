@@ -3,10 +3,10 @@ import glob
 import os
 import csv, sqlite3
 from pathlib import Path
-db_path="/home/simop/api-dados-extraidos-covid19-sesdf"
+db_path="/home/simop/api-dados-extraidos-sesdf"
 db_name="dados-extraidos-covid19-sesdf.db"
 table_name='dados-extraidos-covid19-sesdf'
-
+print("Script SQLite")
 conn = sqlite3.connect(os.path.join(db_path, db_name)) # change to 'sqlite:///your_filename.db'
 csvfiles_path=str(Path.cwd())
 filename_entry="*.csv"
