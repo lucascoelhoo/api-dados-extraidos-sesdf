@@ -16,6 +16,10 @@ chmod -R a+rwx directory dá acesso completo ao folder e a tudo dentro dele pro 
 
  chmod ugo+rwx /usr/local/bin/gunicorn
 
+chown new-owner filename muda o dono de um arquivo, necessario de vez em quando, principalmente quando copia e move arquivo em sudo
+
+sudo systemctl enable meuservico serve para fazer com que o serviço seja ativado sempre que o linux bootar
+
 -Foi necessario dar permissao total no gunicorn em /usr/local/bin, colocar o /bin/bash no script, dar permissao de execucao pro script, e arrumar o arquivo .service exatamente como esta la, chamando oscript, ams com o environment apontando para o gunicorn, que iriamos usar. Muito chato.
 
 -Esse comando seria melhor para performance (acesso via arquivo): gunicorn --workers 3 --bind unix:app.sock -m 007 wsgi:app
