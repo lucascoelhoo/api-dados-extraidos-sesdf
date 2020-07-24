@@ -29,7 +29,7 @@ import logging
 
 #from flask_cors import CORS
 app = flask.Flask(__name__)
-dbpath='/home/simop/api-dados-extraidos-sesdf/'
+dbpath='/home/nayara/Documentos/api-dados-extraidos-sesdf/'
 dbname='dados-extraidos-covid19-sesdf.db'
 global db
 db=dbpath+dbname
@@ -125,6 +125,21 @@ def api_list():
     return jsonify(all_data)
     #return render_template('site.html')
 
+@app.route('/apiv2/regiao/maxincid', methods=['GET'])
+def api_maxinc():
+    conn = sqlite3.connect(db)
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+    max_data = cur.execute('SELECT MAX(incidencia) FROM \"dados-extraidos-covid19-sesdf\";').fetchone()
+    max_obit = cur.execute('SELECT MAX(obitos) FROM \"dados-extraidos-covid19-sesdf\";').fetchone()
+    maximum = max_data['MAX(incidencia)']
+    interval = int(max_data['MAX(incidencia)']/5)
+    maxObitos = max_obit['MAX(obitos)']
+    intervalObitos = int(max_obit['MAX(obitos)']/5)
+    newDic= {
+        "incid":[interval, 2*interval, 3*interval, 4*interval],
+        "obitos":[intervalObitos, 2*intervalObitos, 3*intervalObitos, 4*intervalObitos]}
+    return jsonify(newDic)
 
 
 def add_headers_to_fontawesome_static_files(response):
@@ -148,4 +163,5 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5003)
     app.after_request(add_headers_to_fontawesome_static_files)
     #app.run(ssl_context='adhoc')
+
 
