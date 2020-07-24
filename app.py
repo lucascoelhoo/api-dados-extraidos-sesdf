@@ -137,7 +137,7 @@ def api_maxinc():
     maxObitos = max_obit['MAX(obitos)']
     intervalObitos = int(max_obit['MAX(obitos)']/5)
     newDic= {
-        "incid":[interval, 2*interval, 3*interval, 4*interval],
+        "num":[interval, 2*interval, 3*interval, 4*interval],
         "obitos":[intervalObitos, 2*intervalObitos, 3*intervalObitos, 4*intervalObitos]}
     return jsonify(newDic)
 
