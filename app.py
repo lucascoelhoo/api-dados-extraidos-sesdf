@@ -184,6 +184,8 @@ def api_predicao():
     #print(*casos,sep="\n")
     #print(*ln_casos,sep="\n")
     #print(*datas,sep="\n")
+    datas=sorted(datas)
+    datas_ordinal=sorted(datas_ordinal)
     datas_predict_ordinal = []
     datas_predict = []   
     for i in range(daysPredict):
@@ -204,6 +206,7 @@ def api_predicao():
     datas_ordinal= datas_ordinal.reshape(-1, 1)
     #datas_predict= datas_predict.reshape(-1, 1)
     datas_predict_ordinal= datas_predict_ordinal.reshape(-1, 1)
+
     
     model = LinearRegression()
     model.fit(datas_ordinal, ln_casos)
