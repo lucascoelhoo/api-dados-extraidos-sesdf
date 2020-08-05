@@ -32,8 +32,8 @@ import pandas as pd
 
 #from flask_cors import CORS
 app = flask.Flask(__name__)
-dbpath='/home/nayara/Documentos/api-dados-extraidos-sesdf/'
-#dbpath='C:/Users/lucas/Desktop/UNB/Mestrado/Projetos/App-Covid-19/api-dados-extraidos-sesdf/'
+#dbpath='/home/nayara/Documentos/api-dados-extraidos-sesdf/'
+dbpath='C:/Users/lucas/Desktop/UNB/Mestrado/Projetos/App-Covid-19/api-dados-extraidos-sesdf/'
 dbname='dados-extraidos-covid19-sesdf.db'
 global db
 db=dbpath+dbname
@@ -148,7 +148,7 @@ def api_maxinc():
 
 
 
-@app.route('/apiv2/Predicao/', methods=['GET'])
+@app.route('/apiv2/predicao/', methods=['GET'])
 def api_predicao():
     query_parameters = request.args;
     regiao = query_parameters.get('regiao')
@@ -225,7 +225,7 @@ def api_predicao():
     array_dict_predict = []
     for i in range(daysPredict-1):
         array_dict_predict.append({})
-        array_dict_predict[i]["dataExtracao"]=str(str(datas[i]))
+        array_dict_predict[i]["dataExtracao"]=str(str(datas_predict[i]))
         array_dict_predict[i]["num"]=str(casos_predito[i])
 
     #response_json
