@@ -16,20 +16,24 @@ if __name__ == "__main__":
 
 import flask
 from flask import Flask
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template,json
 import sqlite3
 #from flask_sslify import SSLify
 import datetime
 from datetime import datetime
+from datetime import timedelta
 import time
 import html
 import logging
-
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import pandas as pd
 
 
 #from flask_cors import CORS
 app = flask.Flask(__name__)
 dbpath='/home/nayara/Documentos/api-dados-extraidos-sesdf/'
+#dbpath='C:/Users/lucas/Desktop/UNB/Mestrado/Projetos/App-Covid-19/api-dados-extraidos-sesdf/'
 dbname='dados-extraidos-covid19-sesdf.db'
 global db
 db=dbpath+dbname
@@ -140,6 +144,94 @@ def api_maxinc():
         "num":[interval, 2*interval, 3*interval, 4*interval],
         "obitos":[intervalObitos, 2*intervalObitos, 3*intervalObitos, 4*intervalObitos]}
     return jsonify(newDic)
+
+
+
+
+@app.route('/apiv2/Predicao/', methods=['GET'])
+def api_predicao():
+    query_parameters = request.args;
+    regiao = query_parameters.get('regiao')
+    if(regiao):
+        regiao=html.unescape(regiao)
+    print(regiao)
+    daysPredict = query_parameters.get('diasPredicao')
+    if(daysPredict):
+        daysPredict=int(html.unescape(daysPredict))
+    print(daysPredict)
+    query = "SELECT * FROM \"dados-extraidos-covid19-sesdf\" WHERE"
+    to_filter = []
+    if (regiao):
+        query += ' regiao=? AND'
+        to_filter.append(regiao)
+    if not (regiao):
+        return page_not_found(404)
+    query = query[:-4] + ';'
+    conn = sqlite3.connect(db)
+    conn.row_factory = dict_factory
+    cur = conn.cursor()
+    results = cur.execute(query, to_filter).fetchall()
+
+    casos=[]
+    ln_casos=[]
+    datas=[]
+    datas_ordinal=[]
+    for result,index in zip(results,range(len(results))):
+        casos.append(int(result['num']))
+        ln_casos.append(np.log(int(result['num'])))
+        datas.append(datetime.strptime(str(result['dataExtracao']), '%Y-%m-%d').date())
+        datas_ordinal.append(datetime.strptime(str(result['dataExtracao']), '%Y-%m-%d').toordinal())
+    #print(*casos,sep="\n")
+    #print(*ln_casos,sep="\n")
+    #print(*datas,sep="\n")
+    datas_predict_ordinal = []
+    datas_predict = []   
+    for i in range(daysPredict):
+        datas_predict.append((datas[-1]+timedelta(days=i)))
+        datas_predict_ordinal.append((datas[-1]+timedelta(days=i)).toordinal())
+
+    
+    casos = np.array(casos)
+    ln_casos = np.array(ln_casos)
+    #datas = np.array(datas)
+    datas_ordinal = np.array(datas_ordinal)
+    #datas_predict = np.array(datas_predict)
+    datas_predict_ordinal = np.array(datas_predict_ordinal)
+    
+    casos= casos.reshape(-1, 1)
+    ln_casos= ln_casos.reshape(-1, 1)
+    #datas= datas.reshape(-1, 1)
+    datas_ordinal= datas_ordinal.reshape(-1, 1)
+    #datas_predict= datas_predict.reshape(-1, 1)
+    datas_predict_ordinal= datas_predict_ordinal.reshape(-1, 1)
+    
+    model = LinearRegression()
+    model.fit(datas_ordinal, ln_casos)
+    
+
+    ln_casos_predict = model.predict(datas_predict_ordinal)
+    #print(*ln_casos_predict,sep="\n")
+
+
+    casos_predito=[]
+    for value in ln_casos_predict:
+        casos_predito.append(int(np.exp(value)))
+
+    #print(*casos,sep="\n")
+    #print("\n")
+    #print(*casos_predito,sep="\n")
+    
+
+    array_dict_predict = []
+    for i in range(daysPredict-1):
+        array_dict_predict.append({})
+        array_dict_predict[i]["dataExtracao"]=str(str(datas[i]))
+        array_dict_predict[i]["num"]=str(casos_predito[i])
+
+    #response_json
+    return flask.jsonify(array_dict_predict)
+
+
 
 
 def add_headers_to_fontawesome_static_files(response):
